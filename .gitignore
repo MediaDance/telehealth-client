@@ -1,0 +1,33 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Next.js Build Output
+/.next/
+/out/
+
+# Production Build Artifacts
+build/
+
+# Debug Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Local Environment Variables
+.env*.local
+
+# Vercel Deployment Metadata
+.vercel
+
+# IDE and System Files
+.DS_Store
+*.pem
+.idea/
+.vscode/
+.code-workspacenode_modules/
