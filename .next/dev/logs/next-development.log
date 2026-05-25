@@ -1,0 +1,34 @@
+{"timestamp":"00:00:01.316","source":"Server","level":"LOG","message":""}
+{"timestamp":"00:00:02.349","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
+{"timestamp":"00:00:06.746","source":"Browser","level":"LOG","message":"[SDK Signaling] Connected with ID: AiMd54obZIGcEx6WAAAD"}
+{"timestamp":"00:00:25.628","source":"Browser","level":"LOG","message":"[SDK Signaling] Connected with ID: 2H3Dd2Sc7ygtaXE3AAAF"}
+{"timestamp":"00:02:51.638","source":"Browser","level":"ERROR","message":"[SDK Signaling] Handshake connection error: {\"description\":{\"isTrusted\":true},\"type\":\"TransportError\"}"}
+{"timestamp":"00:02:51.799","source":"Browser","level":"ERROR","message":"[SDK Signaling] Handshake connection error: {\"description\":{\"isTrusted\":true},\"type\":\"TransportError\"}"}
+{"timestamp":"00:02:53.180","source":"Browser","level":"ERROR","message":"[SDK Signaling] Handshake connection error: {\"description\":{\"isTrusted\":true},\"type\":\"TransportError\"}"}
+{"timestamp":"00:02:54.020","source":"Browser","level":"ERROR","message":"[SDK Signaling] Handshake connection error: {\"description\":{\"isTrusted\":true},\"type\":\"TransportError\"}"}
+{"timestamp":"00:02:57.452","source":"Browser","level":"ERROR","message":"[SDK Signaling] Handshake connection error: {\"description\":{\"isTrusted\":true},\"type\":\"TransportError\"}"}
+{"timestamp":"00:02:58.464","source":"Browser","level":"ERROR","message":"[SDK Signaling] Handshake connection error: {\"description\":{\"isTrusted\":true},\"type\":\"TransportError\"}"}
+{"timestamp":"00:03:02.469","source":"Browser","level":"LOG","message":"[SDK Signaling] Connected with ID: fA9x83-Ti8V4AabvAAAB"}
+{"timestamp":"00:03:03.472","source":"Browser","level":"LOG","message":"[SDK Signaling] Connected with ID: 1qcv8yfm40e8Y0S2AAAD"}
+{"timestamp":"00:03:05.982","source":"Server","level":"ERROR","message":"[browser] \"[SDK Signaling] Handshake connection error:\" \"\\u001b[31mError: websocket error\\u001b[39m\" \"\\u001b[2m(../telehealth-sdk/src/managers/SignalingManager.ts:36:17)\\u001b[22m\""}
+{"timestamp":"00:03:05.982","source":"Browser","level":"ERROR","message":"[SDK Signaling] Handshake connection error: \"\\u001b[31mError: websocket error\\u001b[39m\" \"\\u001b[2m(../telehealth-sdk/src/managers/SignalingManager.ts:36:17)\\u001b[22m\""}
+{"timestamp":"00:03:05.983","source":"Server","level":"ERROR","message":"[browser] \"[SDK Signaling] Handshake connection error:\" \"\\u001b[31mError: websocket error\\u001b[39m\" \"\\u001b[2m(../telehealth-sdk/src/managers/SignalingManager.ts:36:17)\\u001b[22m\""}
+{"timestamp":"00:03:05.983","source":"Browser","level":"ERROR","message":"[SDK Signaling] Handshake connection error: \"\\u001b[31mError: websocket error\\u001b[39m\" \"\\u001b[2m(../telehealth-sdk/src/managers/SignalingManager.ts:36:17)\\u001b[22m\""}
+{"timestamp":"00:03:05.983","source":"Server","level":"ERROR","message":"[browser] \"[SDK Signaling] Handshake connection error:\" \"\\u001b[31mError: websocket error\\u001b[39m\" \"\\u001b[2m(../telehealth-sdk/src/managers/SignalingManager.ts:36:17)\\u001b[22m\""}
+{"timestamp":"00:03:05.983","source":"Browser","level":"ERROR","message":"[SDK Signaling] Handshake connection error: \"\\u001b[31mError: websocket error\\u001b[39m\" \"\\u001b[2m(../telehealth-sdk/src/managers/SignalingManager.ts:36:17)\\u001b[22m\""}
+{"timestamp":"00:03:20.232","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
+{"timestamp":"00:03:21.846","source":"Server","level":"ERROR","message":"[browser] \"[SDK Signaling] Handshake connection error:\" \"\\u001b[31mError: websocket error\\u001b[39m\""}
+{"timestamp":"00:03:21.846","source":"Browser","level":"ERROR","message":"[SDK Signaling] Handshake connection error: \"\\u001b[31mError: websocket error\\u001b[39m\""}
+{"timestamp":"00:03:21.847","source":"Server","level":"ERROR","message":"[browser] \"[SDK Signaling] Handshake connection error:\" \"\\u001b[31mError: websocket error\\u001b[39m\""}
+{"timestamp":"00:03:21.847","source":"Browser","level":"ERROR","message":"[SDK Signaling] Handshake connection error: \"\\u001b[31mError: websocket error\\u001b[39m\""}
+{"timestamp":"00:03:21.847","source":"Server","level":"ERROR","message":"[browser] \"[SDK Signaling] Handshake connection error:\" \"\\u001b[31mError: websocket error\\u001b[39m\""}
+{"timestamp":"00:03:21.847","source":"Browser","level":"ERROR","message":"[SDK Signaling] Handshake connection error: \"\\u001b[31mError: websocket error\\u001b[39m\""}
+{"timestamp":"00:03:25.030","source":"Browser","level":"LOG","message":"[SDK Signaling] Connected with ID: oDPday8DHg9ToWaXAAAF"}
+{"timestamp":"00:03:43.975","source":"Browser","level":"LOG","message":"[SDK Signaling] Connected with ID: _pSSrmMloDbkL9KbAAAH"}
+{"timestamp":"00:03:43.975","source":"Browser","level":"LOG","message":"Successfully appended remote ICE candidate."}
+{"timestamp":"00:03:43.975","source":"Browser","level":"LOG","message":"Successfully appended remote ICE candidate."}
+{"timestamp":"00:03:43.975","source":"Browser","level":"LOG","message":"Successfully appended remote ICE candidate."}
+{"timestamp":"00:03:43.975","source":"Browser","level":"LOG","message":"Successfully appended remote ICE candidate."}
+{"timestamp":"00:03:43.975","source":"Browser","level":"LOG","message":"Successfully appended remote ICE candidate."}
+{"timestamp":"00:03:44.057","source":"Browser","level":"LOG","message":"Successfully appended remote ICE candidate."}
+{"timestamp":"00:03:44.057","source":"Browser","level":"LOG","message":"Successfully appended remote ICE candidate."}
