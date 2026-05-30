@@ -1,7 +1,7 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // Tell Next.js to watch and hot-reload this specific local package
+  transpilePackages: ['@mediadance/client-sdk'],
 };
 
-export default nextConfig;
+module.exports = nextConfig;

@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { MediaDanceClient } from '@mediadance/client-sdk';
+import { MediaDanceClient, MediaDanceError } from '@mediadance/client-sdk';
+
 
 // Mock credentials matching your backend validation setup
 const MOCK_CREDENTIALS = {
@@ -31,10 +32,10 @@ export default function TelehealthClient() {
     iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
   };
 
-  // Inside your Next.js Page Component
+
   const client = useMemo(() => {
     return new MediaDanceClient({
-      serverUrl: 'http://localhost:3001' // Points directly to your local infra server
+      serverUrl: 'https://localhost:3001' // Points directly to your local infra server
     });
   }, []);
 
@@ -59,18 +60,53 @@ export default function TelehealthClient() {
     };
   }, [client, setStatus]);
 
-  // THE BUTTON CLICK HANDLER
+
+  useEffect(() => {
+    const handleRuntimeError = (err: MediaDanceError) => {
+      console.error("──> [Runtime Error Alert]:", err.code);
+      setStatus(`Connection lost: ${err.message}`);
+      // Take runtime recovery actions here (e.g., show a reconnect button)
+    };
+
+    client.on('error', handleRuntimeError);
+    // Cleanup listener on unmount to prevent memory leaks!
+    return () => {
+      client.off('error', handleRuntimeError);
+    };
+  }, [client]);
+  
+  /**
+   * Core function to initialize the telehealth session. This encapsulates the entire flow:
+   * 1. Requests a secure session token and edge URL from your backend orchestrator.
+   * 2. Passes these directly into the MediaDanceClient SDK to start the call.
+   * 3. The SDK then handles all media capture, signaling, and peer connection setup under the hood.
+   * 4. Status updates and errors are propagated back up to the UI via event listeners.
+   */
   const handleInitializeSession = async () => {
     try {
-      setStatus('Connecting to infrastructure session...');
+      setStatus('Allocating clinical infrastructure near you...');
       
-      // Pass both the room name and your valid tenant context string
-      await client.startCall('sandbox-room-101', 'tenant_zenspace_prod_01'); 
+      // 2. Pass both straight into the SDK
+      if (process.env.NODE_ENV === 'development') {
+        await client.startCall(); // In dev, we can skip token validation for faster iteration); 
+      } else {
+        // 1. Fetch token and the auto-determined edge URL from your backend orchestrator
+        const response = await fetch('/api/v1/sessions/mint-ticket');
+        const { token, signalingUrl } = await response.json();
+        console.log(`[Production Mode] Initializing session with token: ${token} and signaling URL: ${signalingUrl}`);
+        // e.g., signalingUrl = "https://us-west.mediadance.ai"
+        await client.startCall(token, signalingUrl); 
       
-    } catch (err: any) {
-      setStatus(`Failed to start session: ${err.message}`);
-    }
-  };
+        setStatus('Session securely established.');
+      }
+    } catch (err: unknown) {
+    // This only intercepts setup errors (like permission denied)
+    const platformError = err instanceof MediaDanceError ? err : new Error(String(err));
+    
+    // console.error(`──> [Setup Initialization Failed]: ${platformError.code}`);
+    setStatus(`Failed to start session: ${platformError.message}`);
+  }
+};
 
 // Triggers steps 1, 2, and 3 under the hood completely on demand
 // client.startCall('room-123-abc');
@@ -237,88 +273,90 @@ export default function TelehealthClient() {
   //   setStatus('Session Terminated. Pipeline Cleared.');
   // };
   return (
-    <main className="flex flex-col h-screen bg-black text-white font-mono p-6">
-      {/* Control Header */}
-      <div className="border border-zinc-800 p-4 rounded-xl mb-6 bg-zinc-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-sm font-bold text-zinc-400 uppercase tracking-wider">Telehealth Infrastructure Client</h1>
-          <p className="text-xs text-zinc-500 mt-1">Tenant context: <span className="text-emerald-400">{MOCK_CREDENTIALS.tenantID}</span></p>
+  <main className="relative flex flex-col h-screen bg-black text-white font-mono p-6 overflow-hidden">
+    {/* Control Header */}
+    <div className="z-20 border border-zinc-800 p-4 rounded-xl mb-6 bg-zinc-900/80 backdrop-blur-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <h1 className="text-sm font-bold text-zinc-400 uppercase tracking-wider">Telehealth Infrastructure Client</h1>
+        <p className="text-xs text-zinc-500 mt-1">Tenant context: <span className="text-emerald-400">{MOCK_CREDENTIALS.tenantID}</span></p>
+      </div>
+      <div className="flex items-center gap-4">
+        <div className="text-right">
+          <span className="text-xs text-zinc-400 block">Status Node</span>
+          <span className="text-xs font-semibold text-zinc-200">{status}</span>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="text-right">
-            <span className="text-xs text-zinc-400 block">Status Node</span>
-            <span className="text-xs font-semibold text-zinc-200">{status}</span>
-          </div>
-          {!joined && (
-            <button 
-              onClick={handleInitializeSession}
-              className="bg-white text-black text-xs font-bold px-4 py-2 rounded-lg hover:bg-zinc-200 transition"
-            >
-              Initialize Session
-            </button>
-          )}
+        {!joined && (
+          <button 
+            onClick={handleInitializeSession}
+            className="bg-white text-black text-xs font-bold px-4 py-2 rounded-lg hover:bg-zinc-200 transition"
+          >
+            Initialize Session
+          </button>
+        )}
+      </div>
+    </div>
+
+    {/* Video Container Layer */}
+    <div className="flex-1 relative border border-zinc-800 rounded-2xl bg-zinc-950 overflow-hidden min-h-0">
+      
+      {/* MAIN VIEW: Remote Pipeline (Fills the entire background container) */}
+      <div className="w-full h-full">
+        <div className="absolute top-4 left-4 z-10 bg-black/60 px-3 py-1 rounded-md text-[10px] uppercase text-zinc-400 border border-zinc-800 backdrop-blur-sm">
+          Remote Pipeline
         </div>
+        <video 
+          ref={remoteVideoRef} 
+          className="w-full h-full object-cover" 
+          autoPlay 
+          playsInline 
+        />
       </div>
 
-      {/* Video Grid Matrix */}
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 min-h-0">
-        {/* Local Stream Box */}
-        <div className="relative border border-zinc-800 rounded-2xl bg-zinc-950 overflow-hidden group">
-          <div className="absolute top-4 left-4 z-10 bg-black/60 px-3 py-1 rounded-md text-[10px] uppercase text-zinc-400 border border-zinc-800">
-            Local Feed (Mirror)
-          </div>
-          <video 
-            ref={localVideoRef} 
-            className="w-full h-full object-cover transform -scale-x-100" 
-            autoPlay 
-            playsInline 
-            muted 
-          />
+      {/* FLOATING PiP VIEW: Local Feed Mirror (Pinned top-right) */}
+      <div className="absolute top-4 right-4 z-10 w-40 h-28 sm:w-56 sm:h-36 border border-zinc-800 rounded-xl bg-zinc-950 overflow-hidden shadow-2xl transition-all duration-300">
+        <div className="absolute top-2 left-2 z-10 bg-black/60 px-2 py-0.5 rounded text-[8px] uppercase text-zinc-400 border border-zinc-800/50 backdrop-blur-sm">
+          Local Feed (Mirror)
         </div>
-
-        {/* Remote Stream Box */}
-        <div className="relative border border-zinc-800 rounded-2xl bg-zinc-950 overflow-hidden group">
-          <div className="absolute top-4 left-4 z-10 bg-black/60 px-3 py-1 rounded-md text-[10px] uppercase text-zinc-400 border border-zinc-800">
-            Remote Pipeline
-          </div>
-          <video 
-            ref={remoteVideoRef} 
-            className="w-full h-full object-cover" 
-            autoPlay 
-            playsInline 
-          />
-        </div>
+        <video 
+          ref={localVideoRef} 
+          className="w-full h-full object-cover transform -scale-x-100" 
+          autoPlay 
+          playsInline 
+          muted 
+        />
       </div>
-      {/* Floating Control Overlay inside Local Video Block */}
-      {joined && (
-        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-4 bg-zinc-900/90 border border-zinc-800 px-4 py-2.5 rounded-full shadow-2xl backdrop-blur-sm z-20">
-          {/* Audio Mic Button */}
-          <button 
-            onClick={toggleAudio}
-            className={`p-2.5 rounded-full transition text-xs font-bold ${isMuted ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'}`}
-          >
-            {isMuted ? 'UNMUTE MIC' : 'MUTE MIC'}
-          </button>
+    </div>
 
-          {/* Video Cam Button */}
-          <button 
-            onClick={toggleVideo}
-            className={`p-2.5 rounded-full transition text-xs font-bold ${isCamOff ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'}`}
-          >
-            {isCamOff ? 'START CAM' : 'STOP CAM'}
-          </button>
+    {/* Floating Control Overlay inside Local Video Block */}
+    {joined && (
+      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex items-center gap-4 bg-zinc-900/90 border border-zinc-800 px-4 py-2.5 rounded-full shadow-2xl backdrop-blur-sm z-20">
+        {/* Audio Mic Button */}
+        <button 
+          onClick={toggleAudio}
+          className={`p-2.5 rounded-full transition text-xs font-bold ${isMuted ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'}`}
+        >
+          {isMuted ? 'UNMUTE MIC' : 'MUTE MIC'}
+        </button>
 
-          <div className="w-px h-4 bg-zinc-800" />
+        {/* Video Cam Button */}
+        <button 
+          onClick={toggleVideo}
+          className={`p-2.5 rounded-full transition text-xs font-bold ${isCamOff ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'}`}
+        >
+          {isCamOff ? 'START CAM' : 'STOP CAM'}
+        </button>
 
-          {/* End Call Button */}
-          <button 
-            // onClick={endCallSession}
-            className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2.5 rounded-full transition"
-          >
-            END SESSION
-          </button>
-        </div>
-      )}
-    </main>
+        <div className="w-px h-4 bg-zinc-800" />
+
+        {/* End Call Button */}
+        <button 
+          // onClick={endCallSession}
+          className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2.5 rounded-full transition"
+        >
+          END SESSION
+        </button>
+      </div>
+    )}
+  </main>
   );
 }
